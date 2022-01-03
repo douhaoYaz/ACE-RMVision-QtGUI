@@ -142,6 +142,7 @@ void MainWindow::addImageWidget() {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    task.reset();
     QMainWindow::closeEvent(event);
 }
 
@@ -224,6 +225,48 @@ void MainWindow::initializeImageWidget() {
 //    ImageWidget::registerImage("gray", &(data.img_gray));
 //    ImageWidget::registerImage("roi", &(data.img_roi));
 //    ImageWidget::registerImage("id", &(data.img_id));
+}
+
+void MainWindow::onInitializeSetting(int mode, const QVariant& param1,
+        const QVariant& param2, int type) {
+    std::string path_param;
+    if (mode == 0) {
+        switch (type) {
+        case ROBOT_INFANTRY: default:
+            if (param2.toString().size() == 0)
+                setting.setInfantryParameter("../../parameter/capture/"+param1.toString().toStdString());
+            else
+                setting.setInfantryParameter("../../parameter/capture/"+param1.toString().toStdString(),
+                        "../../parameter/capture/"+param2.toString().toStdString());
+            break;
+       case ROBOT_GUARD:
+            setting.setGuardParameter("../../parameter/capture/"+param1.toString().toStdString());
+            break;
+       }
+    }
+    else if (mode == 1)
+        setting.setVideoParameter("../../video/"+param1.toString().toStdString());
+
+    qDebug() << QString(setting.path_classifier_arm_caffe_net.c_str());
+
+
+//    UITool::log("Thread task start!", FONT_NONE);
+//    if (mode == 0) {
+//        switch (type) {
+//        case CAR_INFANTRY: default:
+//            UITool::log("Now it is INFANTRY mode!", FONT_NONE);
+//            break;
+//       case CAR_GUARD:
+//            UITool::log("Now it is GUARD mode!", FONT_NONE);
+//            break;
+//       case CAR_HERO:
+//            UITool::log("Now it is HERO mode!", FONT_NONE);
+//            break;
+//       }
+//    }
+//    else if (mode == 1)
+//        UITool::log("Now it is VIDEO mode!", FONT_NONE);
+
 }
 
 void MainWindow::onModeChanged(int mode) {
