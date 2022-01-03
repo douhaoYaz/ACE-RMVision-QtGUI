@@ -61,7 +61,7 @@ MainWindow* MainWindow::win = nullptr;
 
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent) {
 
-
+    timer = new QTimer(this);
     this->setDockNestingEnabled(true);
     this->initializeMainImage();
     this->initializeEditWidget();
@@ -70,7 +70,12 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent) {
     this->initializeLogWidget();
     this->initializeMenuBar();
     this->initializeImageWidget();
-
+    connect(timer, &QTimer::timeout,
+            [this]() {
+                updateMainImage();
+                updateShowWidget();
+                checkControlArea();
+            });
 }
 
 void MainWindow::initializeMenuBar() {
@@ -125,6 +130,10 @@ MainWindow* MainWindow::getMainWindow() {
     if (win == nullptr)
         win = new MainWindow();
     return win;
+}
+
+void MainWindow::initialize() {
+    timer->start(1000/60);
 }
 
 void MainWindow::log(const QString& str) {
@@ -227,6 +236,69 @@ void MainWindow::initializeImageWidget() {
 //    ImageWidget::registerImage("id", &(data.img_id));
 }
 
+void MainWindow::updateMainImage() {
+    cv::Mat& img_show = Data::getData().img_show;
+    if (img_show.empty() == false) {
+        cv::Mat img_rgb;
+        cv::cvtColor(img_show, img_rgb, cv::COLOR_BGR2RGB);
+        QLabel* img = qobject_cast<QLabel*>(dock_main->widget());
+        img->setPixmap(QPixmap::fromImage(QImage(img_rgb.data,
+                img_rgb.cols, img_rgb.rows, QImage::Format_RGB888)));
+        img->adjustSize();
+        dock_main->setFixedSize(img->size());
+    }
+}
+
+void MainWindow::updateShowWidget() {
+    ShowWidget* w = qobject_cast<ShowWidget*>(dock_show->widget());
+    QString name = w->getCurrentTableName();
+
+    auto iter = table.find(name);
+    if (iter == table.end())
+        return;
+    auto& vec = iter.value();
+
+    int i = 0;
+    for (auto& pair: vec) {
+        switch (pair.second.getFlag()) {
+        case Pointer::BOOLEAN:
+            w->setItem(i, *static_cast<bool*>(pair.second.get()) ? "True" : "Flase");
+            break;
+        case Pointer::INTEGER:
+            w->setItem(i, QString::number(*static_cast<int*>(pair.second.get())));
+            break;
+        case Pointer::SHORT:
+            w->setItem(i, QString::number(*static_cast<short*>(pair.second.get())));
+            break;
+        case Pointer::FLOAT:
+            w->setItem(i, QString::number(*static_cast<float*>(pair.second.get())));
+            break;
+        case Pointer::DOUBLE:
+            w->setItem(i, QString::number(*static_cast<double*>(pair.second.get())));
+            break;
+        case Pointer::STRING:
+            w->setItem(i, static_cast<char*>(pair.second.get()));
+            break;
+        default:
+            w->setItem(i, "");
+            break;
+        };
+        i++;
+    }
+}
+
+void MainWindow::checkControlArea() {
+    ControlArea* w = qobject_cast<ControlArea*>(dock_ctrl->widget());
+    Parameter& param = Parameter::getParameter();
+    Parameter& param_tmp = Parameter::getTempParameter();
+    if (param.other.color_enemy == param_tmp.other.color_enemy &&
+            param.other.color_enemy != w->radios_color->checkedId())
+        w->radios_color->button(param.other.color_enemy)->click();
+    if (param.other.mode_detect == param_tmp.other.mode_detect &&
+            param.other.mode_detect != w->radios_mode->checkedId())
+        w->radios_mode->button(param.other.mode_detect)->click();
+}
+
 void MainWindow::onInitializeSetting(int mode, const QVariant& param1,
         const QVariant& param2, int type) {
     std::string path_param;
@@ -248,6 +320,7 @@ void MainWindow::onInitializeSetting(int mode, const QVariant& param1,
         setting.setVideoParameter("../../video/"+param1.toString().toStdString());
 
     qDebug() << QString(setting.path_classifier_arm_caffe_net.c_str());
+    task->run();
 
 
 //    UITool::log("Thread task start!", FONT_NONE);

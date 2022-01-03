@@ -46,6 +46,8 @@ public:
 
     static MainWindow* getMainWindow();
 
+    void initialize();
+
     void log(const QString& str);
 
     void addImageWidget();
@@ -73,11 +75,13 @@ private:
     Setting setting;
 
     std::shared_ptr<ThreadRunnerBase> task;
+    QTimer* timer;
     QDockWidget* dock_edit;
     QDockWidget* dock_show;
     QDockWidget* dock_ctrl;
     QDockWidget* dock_log;
     QDockWidget* dock_main;
+    QMap<QString, QVector<QPair<QString, Pointer>>> table;
 
     explicit MainWindow(QWidget* parent=nullptr);
 
@@ -94,6 +98,12 @@ private:
     void initializeLogWidget();
 
     void initializeImageWidget();
+
+    void updateMainImage();
+
+    void updateShowWidget();
+
+    void checkControlArea();
 
 private slots:
     void onInitializeSetting(int mode, const QVariant& param1,
