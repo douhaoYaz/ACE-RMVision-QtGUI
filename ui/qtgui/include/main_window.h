@@ -13,6 +13,32 @@
 #include <QTimer>
 #include <memory>
 
+class MainWindow;
+
+class ControlArea : public QWidget {
+    Q_OBJECT
+public:
+    explicit ControlArea(QWidget* parent=nullptr);
+
+    void paintEvent(QPaintEvent* event) override;
+
+signals:
+    void changeMode(int mode);
+    void save(bool is_save);
+
+private:
+    QButtonGroup* radios_mode;
+    QButtonGroup* radios_color;
+    QRadioButton* radio_armor;
+    QRadioButton* radio_buff;
+    QRadioButton* radio_top;
+    QRadioButton* radio_red;
+    QRadioButton* radio_blue;
+    CheckableButton* btn_save;
+
+    friend class MainWindow;
+};
+
 class MainWindow: public QMainWindow {
     Q_OBJECT
 public:
@@ -36,7 +62,27 @@ public:
 private:
     static MainWindow* win;
 
+    QDockWidget* dock_edit;
+    QDockWidget* dock_show;
+    QDockWidget* dock_ctrl;
+    QDockWidget* dock_log;
+    QDockWidget* dock_main;
+
     explicit MainWindow(QWidget* parent=nullptr);
+
+    void initializeMenuBar();
+
+    void initializeMainImage();
+
+    void initializeEditWidget();
+
+    void initializeShowWidget();
+
+    void initializeControlWidget();
+
+    void initializeLogWidget();
+
+    void initializeImageWidget();
 
 };
 
