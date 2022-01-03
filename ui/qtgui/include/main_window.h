@@ -60,11 +60,19 @@ public:
     void registerTrackBar(const QString& name_bar,
             const QString& key, int min, int max, int* pvalue);
 
+    void setSetting(const Setting& setting);
+
+    Setting& getSettingReference();
+
+    void setTasks(std::shared_ptr<ThreadRunnerBase> task);
+
     void closeEvent(QCloseEvent* event) override;
 
 private:
     static MainWindow* win;
+    Setting setting;
 
+    std::shared_ptr<ThreadRunnerBase> task;
     QDockWidget* dock_edit;
     QDockWidget* dock_show;
     QDockWidget* dock_ctrl;
@@ -86,6 +94,16 @@ private:
     void initializeLogWidget();
 
     void initializeImageWidget();
+
+private slots:
+    void onInitializeSetting(int mode, const QVariant& param1,
+            const QVariant& param2, int type);
+
+    void onModeChanged(int mode);
+
+    void onSave(bool clicked);
+
+    void onColorChanged(int color);
 
 };
 

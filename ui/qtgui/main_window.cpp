@@ -160,6 +160,18 @@ void MainWindow::registerTrackBar(const QString& name_bar,
         const QString& key, int min, int max, int* pvalue) {
 }
 
+void MainWindow::setSetting(const Setting& setting) {
+    this->setting = setting;
+}
+
+Setting& MainWindow::getSettingReference() {
+    return setting;
+}
+
+void MainWindow::setTasks(std::shared_ptr<ThreadRunnerBase> task) {
+    this->task = task;
+}
+
 void MainWindow::initializeMainImage() {
     QLabel* img = new QLabel(this);
     dock_main = new QDockWidget("main", this);
@@ -213,3 +225,35 @@ void MainWindow::initializeImageWidget() {
 //    ImageWidget::registerImage("roi", &(data.img_roi));
 //    ImageWidget::registerImage("id", &(data.img_id));
 }
+
+void MainWindow::onModeChanged(int mode) {
+    DetectMode& m = Parameter::getTempParameter().other.mode_detect;
+    if (m == mode)
+        return;
+    m = static_cast<DetectMode>(mode);
+    if (mode == DETECT_ARMOR)
+        log("Switch mode to ARMOR!");
+    else if (mode == DETECT_BUFF)
+        log("Switch mode to BUFF!");
+    else if (mode == DETECT_TOP)
+        log("Switch mode to TOP");
+    Data::getData().flag_update_param = true;
+}
+
+void MainWindow::onSave(bool clicked) {
+    Parameter::getTempParameter().other.flag_save = clicked;
+    Data::getData().flag_update_param = true;
+}
+
+void MainWindow::onColorChanged(int color) {
+    TargetColor& c = Parameter::getTempParameter().other.color_enemy;
+    if (color == c)
+        return;
+    c = static_cast<TargetColor>(color);
+    if (color == DETECT_RED)
+        log("Detect color is RED!");
+    else if (color == DETECT_BLUE)
+        log("Detect color is BLUE!");
+    Data::getData().flag_update_param = true;
+}
+
