@@ -19,7 +19,7 @@ CapturePage::CapturePage(QWidget* parent): QWidget(parent) {
     lbl_type = new QLabel("兵种:", this);
     l->addWidget(lbl_type, 3, 1);
 
-    QDir dir("../../../ACERMVision_new_douhao/parameter/capture");
+    QDir dir("../../parameter/capture");
     auto list = dir.entryList({ "*.xml" }, QDir::Files|QDir::Readable, QDir::Name);
 
 
@@ -75,7 +75,7 @@ VideoPage::VideoPage(QWidget* parent):
 
     this->setLayout(l);
 
-    QSettings settings("../../../ACERMVision_new_douhao/parameter/GUI/gui.ini", QSettings::IniFormat);
+    QSettings settings("../../parameter/GUI/gui.ini", QSettings::IniFormat);
     QString video = settings.value("start/video").toString();
     selector->setCurrentText("video");
 }
@@ -97,10 +97,10 @@ StartWindow::StartWindow(QWidget *parent):
 
     QLabel* icon = new QLabel(this);
     icon->setFixedSize(60, 60);
-    icon->setStyleSheet("image: url(../../../ACERMVision_new_douhao/materials/icon/logo_white.png)");
+    icon->setStyleSheet("image: url(../../materials/icon/logo_white.png)");
     QLabel* icon_txt = new QLabel(this);
     icon_txt->setFixedSize(150, 50);
-    icon_txt->setStyleSheet("image: url(../../../ACERMVision_new_douhao/materials/icon/txt.png)");
+    icon_txt->setStyleSheet("image: url(../../materials/icon/txt.png)");
     l_icon->addStretch(1);
     l_icon->addWidget(icon);
     l_icon->addWidget(icon_txt);
@@ -120,8 +120,8 @@ StartWindow::StartWindow(QWidget *parent):
     l->addWidget(widget_tab, 0, Qt::AlignCenter);
     l->addStretch(1);
 
-    btn_start = new IconButton("../../../ACERMVision_new_douhao/materials/icon/start_light.png",
-            "../../../ACERMVision_new_douhao/materials/icon/start_white.png", this);
+    btn_start = new IconButton("../../materials/icon/start_light.png",
+            "../../materials/icon/start_white.png", this);
     btn_start->setCursor(Qt::PointingHandCursor);
     btn_start->setFixedSize(50, 50);
     l->addWidget(btn_start, 0, Qt::AlignCenter);
@@ -134,7 +134,7 @@ StartWindow::StartWindow(QWidget *parent):
     QObject::connect(btn_start, SIGNAL(clicked()), this, SLOT(onStart()));
 
 
-    QSettings settings("../../../ACERMVision_new_douhao/parameter/GUI/gui.ini", QSettings::IniFormat);
+    QSettings settings("../../parameter/GUI/gui.ini", QSettings::IniFormat);
     QPoint pos = settings.value("start/pos").toPoint();
 
     int page = settings.value("start/page").toInt();
@@ -155,7 +155,7 @@ StartWindow::StartWindow(QWidget *parent):
 }
 
 void StartWindow::closeEvent(QCloseEvent* event) {
-    QSettings settings("../../../ACERMVision_new_douhao/parameter/GUI/gui.ini", QSettings::IniFormat);
+    QSettings settings("../../parameter/GUI/gui.ini", QSettings::IniFormat);
     settings.setValue("start/pos", QPoint(this->pos()));
     settings.setValue("start/page", widget_tab->getCurrentIndex());
 
