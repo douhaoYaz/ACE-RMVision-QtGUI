@@ -62,7 +62,7 @@ MainWindow* MainWindow::win = nullptr;
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent) {
 
 
-//    this->setDockNestingEnabled(true);
+    this->setDockNestingEnabled(true);
     this->initializeMainImage();
     this->initializeEditWidget();
     this->initializeShowWidget();
@@ -77,9 +77,44 @@ void MainWindow::initializeMenuBar() {
     QMenuBar* menubar = new QMenuBar(this);
 
     QMenu* menu_win = new QMenu("窗口", this);
+
+//    auto callback_action = [](QWidget* widget, bool hidden) {
+//        if (widget->isHidden() == hidden)
+
+//    };
+
+    QAction* action_edit = new QAction("Edit", this);
+    action_edit->setCheckable(true);
+    menu_win->addAction(action_edit);
+    connect(dock_edit, SIGNAL(visibilityChanged(bool)), action_edit, SLOT(setChecked(bool)));
+    connect(action_edit, SIGNAL(toggled(bool)), dock_edit, SLOT(setVisible(bool)));
+
+    QAction* action_show = new QAction("Show", this);
+    action_show->setCheckable(true);
+    menu_win->addAction(action_show);
+    connect(dock_show, SIGNAL(visibilityChanged(bool)), action_show, SLOT(setChecked(bool)));
+    connect(action_show, SIGNAL(toggled(bool)), dock_show, SLOT(setVisible(bool)));
+
+    QAction* action_log = new QAction("Log", this);
+    action_log->setCheckable(true);
+    menu_win->addAction(action_log);
+    connect(dock_log, SIGNAL(visibilityChanged(bool)), action_log, SLOT(setChecked(bool)));
+    connect(action_log, SIGNAL(toggled(bool)), dock_log, SLOT(setVisible(bool)));
+
+    QAction* action_ctrl = new QAction("Control", this);
+    action_ctrl->setCheckable(true);
+    menu_win->addAction(action_ctrl);
+    connect(dock_ctrl, SIGNAL(visibilityChanged(bool)), action_ctrl, SLOT(setChecked(bool)));
+    connect(action_ctrl, SIGNAL(toggled(bool)), dock_ctrl, SLOT(setVisible(bool)));
+
     menubar->addMenu(menu_win);
 
     QMenu* menu_create = new QMenu("创建", menubar);
+
+    QAction* action_create_img = new QAction("Image Widget");
+    connect(action_create_img, &QAction::triggered,
+            this, &MainWindow::addImageWidget);
+    menu_create->addAction(action_create_img);
 
     menubar->addMenu(menu_create);
     this->setMenuBar(menubar);
@@ -93,6 +128,17 @@ MainWindow* MainWindow::getMainWindow() {
 }
 
 void MainWindow::log(const QString& str) {
+}
+
+void MainWindow::addImageWidget() {
+    QDockWidget* dock = new QDockWidget("image", this);
+    dock->setFloating(true);
+    dock->setAttribute(Qt::WA_DeleteOnClose);
+    ImageWidget* w = new ImageWidget(dock);
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    dock->setWidget(w);
+    dock->show();
+//    connect(timer, SIGNAL(timeout()), w, SLOT(refresh()));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

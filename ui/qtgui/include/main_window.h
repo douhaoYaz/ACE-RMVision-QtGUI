@@ -6,6 +6,7 @@
 #include "ui.h"
 #include "edit_widget.h"
 #include "show_widget.h"
+#include "image_widget.h"
 #include "setting.h"
 #include <QButtonGroup>
 #include <QRadioButton>
@@ -46,6 +47,8 @@ public:
     static MainWindow* getMainWindow();
 
     void log(const QString& str);
+
+    void addImageWidget();
 
     void registerTable(const QString& name_table,
             const QVector<QPair<QString, Pointer>>& kvs);
