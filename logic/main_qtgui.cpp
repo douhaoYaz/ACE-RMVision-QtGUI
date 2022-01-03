@@ -24,6 +24,10 @@ int main(int argc, char* argv[]) {
     Setting setting;
     win_main->setSetting(setting);
 
+    std::shared_ptr<ThreadRunner> tasks(new ThreadRunner(win_main->getSettingReference()));
+
+    win_main->setTasks(tasks);
+
     win_start->show();
 
     if (win_start->exec() != QDialog::Accepted) {
