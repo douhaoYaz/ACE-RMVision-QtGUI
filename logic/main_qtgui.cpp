@@ -3,12 +3,18 @@
 #include "main_window.h"
 #include "thread_task.h"
 #include <QApplication>
+#include <QFile>
 
 int main(int argc, char* argv[]) {
 
     UserInterfaceFactory::getFactory().initialize();
 
     QApplication app(argc, argv);
+
+    QFile qss("../../materials/stylesheet/main.qss");
+    qss.open(QFile::ReadOnly|QFile::Text);
+    app.setStyleSheet(qss.readAll());
+    qss.close();
 
     StartWindow* win_start = new StartWindow();
 
