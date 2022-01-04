@@ -126,6 +126,7 @@ void MainWindow::initializeMenuBar() {
 }
 
 
+
 MainWindow* MainWindow::getMainWindow() {
     if (win == nullptr)
         win = new MainWindow();
@@ -137,6 +138,8 @@ void MainWindow::initialize() {
 }
 
 void MainWindow::log(const QString& str) {
+    QListWidget* w = qobject_cast<QListWidget*>(dock_log->widget());
+    w->addItem(str);
 }
 
 void MainWindow::addImageWidget() {
@@ -147,7 +150,7 @@ void MainWindow::addImageWidget() {
     w->setAttribute(Qt::WA_DeleteOnClose);
     dock->setWidget(w);
     dock->show();
-//    connect(timer, SIGNAL(timeout()), w, SLOT(refresh()));
+    connect(timer, SIGNAL(timeout()), w, SLOT(refresh()));
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -157,17 +160,35 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 void MainWindow::registerTable(const QString& name_table,
         const QVector<QPair<QString, Pointer>>& kvs) {
+    table.insert(name_table, kvs);
+    QStringList l;
+    for (auto& pair: kvs)
+        l.push_back(pair.first);
+    auto w = qobject_cast<ShowWidget*>(dock_show->widget());
+    w->addModel(name_table, l);
 }
 
 void MainWindow::setCurrentTable(const QString& name) {
+    auto w = qobject_cast<ShowWidget*>(dock_show->widget());
+    w->changeModel(name);
 }
 
 void MainWindow::createEditItem(const QString& name) {
+    auto w = qobject_cast<EditWidget*>(dock_edit->widget());
+    w->addItemBar(name);
 }
 
 
 void MainWindow::registerTrackBar(const QString& name_bar,
         const QString& key, int min, int max, int* pvalue) {
+    int offset = min;
+    bool& flag = Data::getData().flag_update_param;
+    auto callback = [offset, &flag](int* p, int src) {
+        *p = src-offset;
+        flag = true;
+    };
+    auto w = qobject_cast<EditWidget*>(dock_edit->widget());
+    w->addTrackbarItem(name_bar, key, min, max, pvalue, callback);
 }
 
 void MainWindow::setSetting(const Setting& setting) {

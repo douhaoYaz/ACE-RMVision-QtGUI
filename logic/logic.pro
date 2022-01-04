@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = ACEVision
 
 #更改这里以改变ui
-DEFINES += CUI
+DEFINES += QTGUI
 
 CONFIG += console c++11
 LIBS += \
@@ -51,6 +51,27 @@ SOURCES += \
     solve_angle.cpp \
     top_detector.cpp \
     ui.cpp
+
+contains(DEFINES, QTGUI){
+    greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+    QT += core gui
+
+    LIBS += \
+        -L../../build-ACERMVision/bin/ \
+        -lui-component \
+        -lqtgui
+
+    INCLUDEPATH += \
+            ../ui/qtgui/include \
+            ../ui-component/include
+
+    SOURCES += \
+            main_qtgui.cpp \
+            qtgui.cpp
+
+    HEADERS += \
+            qtgui.h
+}
 
 contains(DEFINES, CUI) {
     CONFIG -= app_bundle
